@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./output.css" rel="stylesheet">
+  <title>JualDiSini-mainpage</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+ 
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  
+
+  <style>
+    .hero-pattern {
+        background-color: #f8f5f0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e9c46a' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .gradient-button {
+        background: linear-gradient(135deg, #2a9d8f 0%, #264653 100%);
+    }
+    
+    .gradient-button:hover {
+        background: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
+    }
+    
+    .primary-gradient {
+        background: linear-gradient(135deg, #2a9d8f 0%, #264653 100%);
+    }
+    
+    .header-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .secondary-button {
+        background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+    }
+    
+    .secondary-button:hover {
+        background: linear-gradient(135deg, #e76f51 0%, #f4a261 100%);
+    }
+    .dark-button {
+        background: #264653;
+    }
+</style>
+</head>
+<body class="font-sans antialiased text-gray-800">
+    <!-- Header -->
+    <header class="bg-white header-shadow fixed w-full z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <span class="font-bold text-xl text-teal-700" style="color: #2a9d8f">JualDiSini</span>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="font-medium hover:text-teal-600 transition" style="color: #264653">Beranda</a>
+                <a href="peta.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Peta</a>
+                <a href="form.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Tambah Lokasi</a>
+                <a href="index.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Kontak</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="font-medium hover:text-teal-600 transition" style="color: #2a9d8f">Masuk</a>
+                <a href="#" class="gradient-button text-white px-4 py-2 rounded-md transition">Daftar</a>
+                <button class="md:hidden focus:outline-none">
+                    <i class="fas fa-bars text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern pt-32 pb-24">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4" style="color: #264653">
+                        Temukan Lokasi Jualan Terbaik di Kota Surakarta
+                    </h1>
+                    <p class="text-lg md:text-xl mb-8 max-w-lg" style="color: #2a9d8f">
+                        Platform berbasis peta untuk membantu UMKM memilih tempat jualan strategis berdasarkan keramaian, izin wilayah, dan waktu operasional
+                    </p>
+                    <a href="peta.html"><button class="gradient-button hover:shadow-xl text-white font-bold py-4 px-8 rounded-lg text-lg shadow-lg transition transform hover:scale-105 " >
+                        Mulai Cari Lokasi
+                    </button></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" style="color: #264653">Layanan Kami</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gradient-to-br from-teal-50 to-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="background-color: rgba(42, 157, 143, 0.2)">
+                        <i class="fas fa-map-marked-alt text-xl" style="color: #2a9d8f"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #264653">Analisis Lokasi</h3>
+                    <p style="color: #2a9d8f">Dapatkan rekomendasi lokasi berdasarkan data keramaian dan pergerakan orang di Kota Surakarta</p>
+                </div>
+                <div class="bg-gradient-to-br from-teal-50 to-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="background-color: rgba(42, 157, 143, 0.2)">
+                        <i class="fas fa-file-contract text-xl" style="color: #2a9d8f"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #264653">Waktu Optimal</h3>
+                    <p style="color: #2a9d8f">Tentukan jadwal operasional terbaik berdasarkan pola keramaian dan jam sibuk di setiap lokasi</p>
+                </div>
+                <div class="bg-gradient-to-br from-teal-50 to-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="background-color: rgba(42, 157, 143, 0.2)">
+                        <i class="fas fa-clock text-xl" style="color: #2a9d8f"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: #264653">Tambah Lokasi</h3>
+                    <p style="color: #2a9d8f">pedagang atau warga bisa menambahkan lokasi mereka untuk nanti ditampilkan ke dalam website</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16" style="background: linear-gradient(135deg, #264653 0%, #2a9d8f 100%)">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Siap Menemukan Lokasi Jualan Terbaik?</h2>
+            <p class="text-white text-lg mb-8 max-w-2xl mx-auto">Bergabunglah dengan ribuan pelaku UMKM lainnya yang telah meningkatkan penjualan mereka dengan lokasi strategis</p>
+            <a href="form.html"><button class="shadow-lg transition transform hover:scale-105 font-bold py-4 px-8 rounded-lg text-lg text-white gradient-button" >
+                Tambahkan Lokasi Sekarang
+            </button></a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-white py-12" style="background: linear-gradient(to bottom, #264653, #1a323c)">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="logo-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <span class="font-bold text-xl">JualDiSini</span>
+                    </div>
+                    <p class="text-gray-300">Membantu UMKM menemukan lokasi strategis untuk berjualan di Kota Surakarta.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Layanan</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Peta Lokasi</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Analisis Keramaian</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Info Perizinan</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Konsultasi Lokasi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Perusahaan</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Tentang Kami</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Karir</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Blog</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Kontak</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Hubungi Kami</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2" style="color: #e9c46a"></i> info@jualdisini.id</li>
+                        <li class="flex items-center"><i class="fas fa-phone mr-2" style="color: #e9c46a"></i> +62 812 3456 7890</li>
+                        <li class="flex items-center"><i class="fas fa-map-pin mr-2" style="color: #e9c46a"></i> Jl. Slamet Riyadi No. 123, Surakarta</li>
+                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 JualDiSini. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

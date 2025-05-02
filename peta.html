@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <title>Peta Pedagang Kota Surakarta</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #2a9d8f;
+            --primary-dark: #264653;
+            --accent: #e9c46a;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --red: #e76f51;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        
+        #map { 
+            height: 70vh; 
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            padding: 12px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--primary-dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            color: var(--primary);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .auth-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .login-link {
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link:hover {
+            color: var(--primary-dark);
+        }
+        
+        .register-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .register-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 157, 143, 0.2);
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            padding-top: 100px;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .page-title h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+        
+        .page-title p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .map-filter-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .filter-container {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            height: fit-content;
+            border-top: 4px solid var(--primary);
+        }
+        
+        .filter-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-group {
+            margin-bottom: 24px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #fafafa;
+            color: #444;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+        
+        .reset-btn {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .reset-btn:hover {
+            background-color: #1d3743;
+        }
+        
+        .apply-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .apply-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 157, 143, 0.2);
+        }
+        
+        .map-container {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            position: relative;
+        }
+        
+        .legend-container {
+            background-color: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 16px;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .legend-text {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .popup-content {
+            padding: 12px;
+            min-width: 200px;
+        }
+        
+        .popup-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 6px;
+        }
+        
+        .popup-detail {
+            margin: 6px 0;
+            display: flex;
+            gap: 6px;
+            font-size: 0.9rem;
+            align-items: baseline;
+        }
+        
+        .popup-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .popup-value {
+            color: #333;
+        }
+        
+        .popup-description {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #444;
+        }
+        
+        .footer {
+            background-color: var(--white);
+            padding: 32px 0;
+            margin-top: 48px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .copyright {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 900px) {
+            .map-filter-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .filter-container {
+                order: 1;
+            }
+            
+            .map-container {
+                order: 0;
+            }
+            
+            #map {
+                height: 50vh;
+            }
+            
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <span class="logo-text">JualDiSini</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Beranda</a>
+                <a href="peta.html" class="nav-link active">Peta</a>
+                <a href="form.html" class="nav-link">Tambah Lokasi</a>
+                <a href="index.html" class="nav-link">Kontak</a>
+            </div>
+            
+            <div class="auth-links">
+                <a href="#" class="login-link">Masuk</a>
+                <a href="#" class="register-btn">Daftar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <h1>Peta Lokasi Pedagang Kota Surakarta</h1>
+            <p>Temukan Lokasi berjualan sesuai kebutuhan Anda di seluruh wilayah Kota Solo</p>
+        </div>
+        
+        <div class="map-filter-layout">
+            <!-- Filter Sidebar -->
+            <div class="filter-container">
+                <h2 class="filter-title">
+                    <i class="fas fa-filter" style="color: var(--primary);"></i>
+                    Filter Pedagang
+                </h2>
+                
+                <div class="filter-group">
+                    <label for="jenisDagangan" class="filter-label">
+                        <i class="fas fa-tags" style="margin-right: 6px;"></i>
+                        Jenis Dagangan
+                    </label>
+                    <select id="jenisDagangan" class="filter-select">
+                        <option value="semua">Semua Jenis</option>
+                        <option value="makanan">Makanan</option>
+                        <option value="pakaian">Pakaian</option>
+                        <option value="jasa">Jasa</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="jamJualan" class="filter-label">
+                        <i class="far fa-clock" style="margin-right: 6px;"></i>
+                        Jam Jualan
+                    </label>
+                    <select id="jamJualan" class="filter-select">
+                        <option value="semua">Semua Jam</option>
+                        <option value="pagi">Pagi</option>
+                        <option value="siang">Siang</option>
+                        <option value="sore">Sore</option>
+                        <option value="malam">Malam</option>
+                    </select>
+                </div>
+                
+                <div class="filter-actions">
+                    <button id="resetFilters" class="reset-btn">
+                        <i class="fas fa-redo-alt"></i>
+                        Reset
+                    </button>
+                    <button id="applyFilters" class="apply-btn">
+                        <i class="fas fa-search"></i>
+                        Terapkan
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Map Container -->
+            <div class="map-container">
+                <div id="map"></div>
+                
+                <!-- Legend -->
+                <div class="legend-container">
+                    <div class="legend-title">Legenda Peta:</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #2a9d8f"></div>
+                            <span class="legend-text">Makanan</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #e76f51"></div>
+                            <span class="legend-text">Pakaian</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #e9c46a"></div>
+                            <span class="legend-text">Jasa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <span class="logo-text">JualDiSini</span>
+            </div>
+            <p class="copyright">&copy; 2025 JualDiSini. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Koordinat tengah Kota Surakarta
+        const surakartaCoords = [-7.5655, 110.8280];
+        
+        // Inisialisasi peta
+        const map = L.map('map').setView(surakartaCoords, 13);
+        
+        // Tambahkan tile layer dari OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Tetapkan radius untuk zona (dalam meter)
+        const FIXED_RADIUS = 150;
+        
+        // Data pedagang dengan radius yang berbeda berdasarkan jenis
+        const pedagangData = [
+            
+            
+            {
+                nama: "Depan Balai Kota Surakarta",
+                koordinat: [-7.569493378430963, 110.83012600800558],
+                jenisDagangan: "makanan",
+                jamJualan: "malam",
+                deskripsi: "Lokasi favorit warga untuk bersantai dan kulineran malam.",
+                warna: "green",
+                radius: 120
+            },
+            {
+                nama: "Pasar Gede Harjonagoro",
+                koordinat: [-7.569155014200469, 110.83147420839379],
+                jenisDagangan: "makanan",
+                jamJualan: "siang",
+                deskripsi: "Pusat keramaian dan belanja kebutuhan harian.",
+                warna: "green",
+                radius: 120
+            },
+            {
+                nama: "Ngarsopuro Night Market",
+                koordinat: [-7.568653098624986, 110.8223165900845],
+                jenisDagangan: "makanan",
+                jamJualan: "malam",
+                deskripsi: "Car Free Night, ramai wisatawan dan warga lokal.",
+                warna: "green",
+                radius: 120
+            },
+            {
+                nama: "Depan Kampus UNS",
+                koordinat: [-7.554956991500269, 110.85578057815579],
+                jenisDagangan: "makanan",
+                jamJualan: "pagi",
+                deskripsi: "Banyak mahasiswa butuh makanan murah & layanan cepat.",
+                warna: "green",
+                radius: 120
+            },
+  {
+    nama: "Jl. Slamet Riyadi (Sriwedari – SGM)",
+    koordinat: [-7.5665, 110.8275],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Area komersial utama Solo, lalu lintas tinggi.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Klewer",
+    koordinat: [-7.575405313545172, 110.82667152849015],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Pusat batik Solo, cocok untuk pedagang tekstil dan oleh-oleh.",
+    warna: "red",
+    radius: 120
+  },
+  {
+    nama: "Alun-Alun Kidul",
+    koordinat: [-7.582145789847979, 110.82723825963446],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Area santai keluarga, cocok untuk jajanan dan permainan.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Stasiun Solo Balapan",
+    koordinat: [-7.557240559392144, 110.82098258157193],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Ramai pengguna kereta, cocok untuk makanan instan/cepat.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Taman Satwa Taru Jurug (TSJT)",
+    koordinat: [-7.564496141922258, 110.85821943484562],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Wisata keluarga, cocok untuk mainan dan kuliner anak.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Car Free Day Slamet Riyadi",
+    koordinat: [-7.567430298759796, 110.8128882683071],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Ribuan pengunjung tiap minggu. Cocok untuk launching produk.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Depan Solo Technopark",
+    koordinat: [-7.555859566856903, 110.85392125321889],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Dekat kampus dan pusat startup, bisa jual makanan sehat dan kopi.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Taman Balekambang",
+    koordinat: [-7.55251462805508, 110.80754900795478],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Lokasi wisata alam tengah kota, banyak keluarga dan remaja.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Terminal Tirtonadi",
+    koordinat: [-7.5515173979687304, 110.81835856097926],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Strategis untuk jual makanan grab-and-go bagi pelancong.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Legi",
+    koordinat: [-7.562800797504256, 110.82426377378479],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Pasar tradisional ramai, cocok untuk jual kebutuhan rumah tangga.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Solo Paragon Mall (luar)",
+    koordinat: [-7.561613825163645, 110.80999180778221],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Tempat anak muda nongkrong. Cocok untuk brand kekinian.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Taman Tirtonadi",
+    koordinat: [-7.5515757756300586, 110.8205429622153],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Lokasi piknik sore warga, cocok jual es krim, cilok, dll.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Manahan (shelter)",
+    koordinat: [-7.554266489417112, 110.80344932589018],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Ramai saat olahraga pagi dan acara stadion.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Gladag Langen Bogan (Galabo)",
+    koordinat: [-7.572817272453725, 110.83012636647061],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Sentra kuliner malam. Ramai sampai tengah malam.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pura Mangkunegaran",
+    koordinat: [-7.56706921413587, 110.82282171627233],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Spot wisata budaya, cocok untuk makanan tradisional & jasa wisata.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Antik Triwindu",
+    koordinat: [-7.569165169126357, 110.82234099797176],
+    jenisDagangan: "jasa",
+    jamJualan: "pagi",
+    deskripsi: "Cocok untuk jual barang seni, koleksi, kerajinan tangan.",
+    warna: "yellow",
+    radius: 120
+  },
+  {
+    nama: "Kawasan Laweyan",
+    koordinat: [-7.569028926863631, 110.79460007339738],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Cocok untuk produk batik handmade, edukasi, dan fashion.",
+    warna: "red",
+    radius: 120
+  },
+  {
+    nama: "Kawasan Solo Baru",
+    koordinat: [-7.611021583562157, 110.81009982075088],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Pusat keramaian masyarakat muda. Strategis untuk produk trendi.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Jl. Veteran",
+    koordinat: [-7.5813210263433835, 110.81767858631805],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Ramai pelajar dan mahasiswa, cocok untuk dagangan ekonomis.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Benteng Vastenburg",
+    koordinat: [-7.571892551792461, 110.83066124770629],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Spot bersejarah dan sering jadi tempat event budaya.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Depan sma 3 solo",
+    koordinat: [-7.564613427584812, 110.84080273241172],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Ramai pelajar, cocok untuk dagangan ekonomis.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Kawasan UMS",
+    koordinat: [-7.556220562556719, 110.76958173932202],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Daerah padat mahasiswa, sangat potensial.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Kadipolo",
+    koordinat: [-7.572523018848044, 110.81560546002063],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Pasar tradisional dengan aktivitas tinggi di pagi hari.",
+    warna: "green",
+    radius: 120
+  },
+  
+  {
+    nama: "Taman Cerdas Jebres",
+    koordinat: [-7.554038268670144, 110.85341568944077],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Spot anak-anak bermain, cocok jualan es, cilok, atau mainan.",
+    warna: "green",
+    radius: 120
+  },
+  
+  {
+    nama: "Halaman Masjid Agung Surakarta",
+    koordinat: [-7.574539867470816, 110.82731114972758],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Ramai saat Ramadan atau hari besar keagamaan.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Nongko",
+    koordinat: [-7.558591977437965, 110.81491125868436],
+    jenisDagangan: "makanan",
+    jamJualan: "pagi",
+    deskripsi: "Pasar rakyat yang ramai tiap pagi.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Depan RSUD Dr. Moewardi",
+    koordinat: [-7.559384406455571, 110.84226931400755],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Cocok untuk dagangan praktis bagi pengunjung rumah sakit.",
+    warna: "green",
+    radius: 120
+  },
+  
+  
+  {
+    nama: "Jl. Yosodipuro",
+    koordinat: [-7.56322992520652, 110.8144239510485],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Ramai oleh warung dan angkringan saat malam.",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Pasar Harjodaksino",
+    koordinat: [-7.584095338726232, 110.82002341640887],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Pasar rakyat dengan pelanggan tetap.",
+    warna: "red",
+    radius: 120
+  },
+  
+  
+  {
+    nama: "Pasar Elpamas Banjarsari",
+    koordinat: [-7.5586773460843455, 110.82508580743266],
+    jenisDagangan: "jasa",
+    jamJualan: "pagi",
+    deskripsi: "Pasar kecil namun aktif warga lokal.",
+    warna: "yellow",
+    radius: 120
+  },
+  {
+    nama: "Terminal Kartasura",
+    koordinat: [-7.5442950347837545, 110.73561574455196],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Lalu lintas tinggi, cocok untuk UMKM grab-and-go.",
+    warna: "green",
+    radius: 120
+  },
+  
+  {
+    nama: "Area Luwes Nusukan",
+    koordinat: [-7.541659262543603, 110.82036876656886],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Pusat belanja warga lokal.",
+    warna: "green",
+    radius: 120
+  },
+  
+  {
+    nama: "Depan GOR Sritex Arena",
+    koordinat: [-7.570997375144324, 110.81516410260917],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Ramai saat pertandingan atau event.",
+    warna: "green",
+    radius: 120
+  },
+  
+  {
+    nama: "Kampoeng Batik Laweyan",
+    koordinat: [-7.570045993581924, 110.7940430926334],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Kawasan wisata batik yang banyak dikunjungi turis lokal maupun mancanegara.",
+    warna: "red",
+    radius: 120
+  },
+  
+  {
+    nama: "Pasar Nongko",
+    koordinat: [-7.558564362479391, 110.81494301471841],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Pasar lokal yang juga menjual berbagai jenis pakaian dan kain.",
+    warna: "red",
+    radius: 120
+  },
+  {
+    nama: "Pasar Jongke",
+    koordinat: [-7.567542022082236, 110.7892337052705],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Dikenal sebagai tempat belanja pakaian dan peralatan rumah tangga murah.",
+    warna: "red",
+    radius: 120
+  },
+  {
+    nama: "Solo Paragon Mall (area luar)",
+    koordinat: [-7.5621834508784405, 110.81036093840541],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Banyak tenant fashion lokal berjualan di area sekitar mall.",
+    warna: "red",
+    radius: 120
+  },
+  {
+    nama: "Jl. Dr. Rajiman",
+    koordinat: [-7.571390862252279, 110.80561110764405],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Pusat servis HP, laptop, dan jasa teknologi lainnya.",
+    warna: "yellow",
+    radius: 120
+  },
+  {
+    nama: "Depan Kampus UNS",
+    koordinat: [-7.556342039518624, 110.86029484140913],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Banyak kebutuhan jasa print, fotokopi, dan desain untuk mahasiswa.",
+    warna: "yellow",
+    radius: 120
+  },
+  
+  
+  {
+    nama: "Jl. Gajahmada",
+    koordinat: [-7.563209134559923, 110.81891563668498],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Deretan toko dan jasa percetakan, sablon, serta desain grafis.",
+    warna: "yellow",
+    radius: 120
+  },
+  {
+    nama: "Depan SMA Al Islam 1 Surakarta",
+    koordinat: [-7.5741982306016995, 110.81607976269792],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "jam jajan siswa siswi sma al islam 1",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Depan SMA Negeri 1 Surakarta",
+    koordinat: [-7.558771225747592, 110.83049809664062],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "jam jajan siswa siswi SMAN 1 Surakarta",
+    warna: "green",
+    radius: 120
+  },
+  {
+    nama: "Depan Kampus Poltek ATMI Surakarta",
+    koordinat: [-7.552899636276352, 110.77594991371194],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Cocok untuk mahasiswa yang mencari makanan praktis dan hemat.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Halaman Pasar Klithikan ",
+    koordinat: [-7.588078352877981, 110.83755175286684],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Ramai pengunjung yang mencari barang bekas dan jasa reparasi.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: "Depan SD Muhammadiyah 1 Ketelan",
+    koordinat: [-7.565082430619084, 110.82195332533878],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Area ramai siswa, cocok untuk jualan jajanan anak.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Taman Cerdas Mojosongo",
+    koordinat: [-7.5371318023630005, 110.83767386525977],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Ramai anak-anak bermain, cocok untuk camilan sore hari.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan kampus Insitut Seni",
+    koordinat: [-7.558251708008742, 110.852221591723],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Cocok untuk jasa fotokopi dan desain bagi mahasiswa seni.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: "Halaman Pasar Ikan Balekambang",
+    koordinat: [-7.5540736339075245, 110.80908228918062],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Area jual beli yang cukup aktif di pagi hari.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Perempatan Nonongan",
+    koordinat: [-7.570907928381214, 110.82433998668496],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Dekat pertokoan dan akses ramai kendaraan.",
+    warna: "red",
+    radius: 120
+},
+
+{
+    nama: "Lapangan Kotta Barat",
+    koordinat: [-7.5622170119613425, 110.80700547517117],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Spot favorit olahraga sore, cocok untuk jajanan ringan.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Belakang RRI Solo",
+    koordinat: [-7.558747647740273, 110.82198129531372],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Tempat angkringan aktif hingga malam.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan Masjid Raya Sheikh Zayed",
+    koordinat: [-7.554930566973862, 110.82774740110172],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Spot oleh-oleh dan busana muslim.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Terminal Palur (luar shelter)",
+    koordinat: [-7.565969280653013, 110.87208557893837],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Ramai penumpang dan pedagang malam.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan SMK Negeri 6 Surakarta",
+    koordinat: [-7.553641882098339, 110.79888524371142],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Jajanan murah dan cepat laku di jam pulang sekolah.",
+    warna: "green",
+    radius: 120
+},
+
+
+{
+    nama: "Kompleks Pasar Legi Timur",
+    koordinat: [-7.563231423148823, 110.8261239675935],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Banyak tempat servis dan jahit pakaian.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: "Kampung Kalitan",
+    koordinat: [-7.564202068704994, 110.80922672201757],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Dekat kawasan kampung budaya, cocok makanan tradisional.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Pintu Utara Benteng Vastenburg",
+    koordinat: [-7.571028102302649, 110.83106891580006],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Banyak seniman jalanan dan penyedia jasa foto.",
+    warna: "yellow",
+    radius: 120
+},
+
+{
+    nama: "Jl. Samratulangi depan SMP 1 Surakarta",
+    koordinat: [-7.5579013961821255, 110.80881907382783],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Anak sekolah banyak jajan di waktu istirahat/pulang.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Parkiran Barat pakuwon mall Solo Baru",
+    koordinat: [-7.600452461625571, 110.8142802493518],
+    jenisDagangan: "jasa",
+    jamJualan: "sore",
+    deskripsi: "Spot strategis untuk jasa foto instan, sewa mainan.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: " (belakang SMP 2)",
+    koordinat: [-7.555370050759948, 110.78911751525841],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Spot jajanan anak sekolah dan warga sekitar.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Kompleks Taman Urban Forest UMS",
+    koordinat: [-7.571408649753667, 110.8474763720238],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Area ramai mahasiswa yang berolahraga dan nongkrong.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan Luwes Sangkrah",
+    koordinat: [-7.573079252868167, 110.8328657856335],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Titik padat pembeli dari daerah selatan Solo.",
+    warna: "red",
+    radius: 120
+},
+
+
+
+{
+    nama: "Jl. Kapten Mulyadi Timur",
+    koordinat: [-7.578945888900685, 110.83132034473218],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Banyak toko jasa elektronik dan sablon digital.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: "Samping Stasiun Purwosari",
+    koordinat: [-7.562326932732302, 110.79630457168996],
+    jenisDagangan: "makanan",
+    jamJualan: "malam",
+    deskripsi: "Angkringan dan kuliner malam aktif hingga larut.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Halaman Museum Batik Danar Hadi",
+    koordinat: [-7.568530755998358, 110.81633770969611],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Cocok untuk cinderamata fashion khas Solo.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Jl. Ronggowarsito - Sekitar Solo Roastery",
+    koordinat: [-7.568658528825852, 110.82374875693866],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Area kuliner dan kopi kekinian yang ramai anak muda.",
+    warna: "green",
+    radius: 120
+},
+
+{
+    nama: "Pasar Semanggi",
+    koordinat: [-7.589731985342319, 110.83347752950154],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Pasar lokal Solo selatan, cocok untuk pakaian dan sembako.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Jl. Arifin Timur",
+    koordinat: [-7.564479678241341, 110.8309500447217],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Jalur padat kendaraan dan banyak karyawan makan siang.",
+    warna: "green",
+    radius: 120
+},
+
+{
+    nama: "Taman Mojosongo (timur lapangan)",
+    koordinat: [-7.537355287523913, 110.84255650824578],
+    jenisDagangan: "makanan",
+    jamJualan: "sore",
+    deskripsi: "Ramai warga olahraga sore hari.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan SMK Warga Surakarta",
+    koordinat: [-7.557836482514526, 110.84687502013095],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Jajanan murah untuk pelajar dan pengantar.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Pasar Klodran",
+    koordinat: [-7.534352575210715, 110.7912426913471],
+    jenisDagangan: "pakaian",
+    jamJualan: "pagi",
+    deskripsi: "Pasar pinggiran yang aktif sejak pagi hari.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Area Masjid Mujahidin Solo",
+    koordinat: [-7.5410475495238405, 110.80826006839536],
+    jenisDagangan: "jasa",
+    jamJualan: "siang",
+    deskripsi: "Dekat tempat ibadah, cocok untuk jasa jilbab, laundry.",
+    warna: "yellow",
+    radius: 120
+},
+{
+    nama: "Parkiran Selatan PGS",
+    koordinat: [-7.5741929863246975, 110.83066292865594],
+    jenisDagangan: "pakaian",
+    jamJualan: "siang",
+    deskripsi: "Sentra pakaian murah dan grosir Solo.",
+    warna: "red",
+    radius: 120
+},
+{
+    nama: "Samping Universitas Nahdlatul Ulama",
+    koordinat: [-7.56993165355467, 110.8056822133952],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Mahasiswa sering mencari makanan praktis dan hemat.",
+    warna: "green",
+    radius: 120
+},
+{
+    nama: "Depan SDN Jayengan",
+    koordinat: [-7.574852052737628, 110.819296548123],
+    jenisDagangan: "makanan",
+    jamJualan: "siang",
+    deskripsi: "Cocok untuk jualan jajanan anak dan minuman ringan.",
+    warna: "green",
+    radius: 120
+},
+
+  
+
+  
+        ];
+        
+        // Array untuk menyimpan marker dan circle yang ditampilkan
+        let circles = [];
+        let centerMarkers = [];
+        
+        // Fungsi untuk mendapatkan radius untuk suatu item
+        function getItemRadius(item) {
+            // Jika item memiliki radius khusus, gunakan itu
+            if (item.radius) {
+                return item.radius;
+            }
+            
+            // Default radius berdasarkan jenis dagangan
+            switch (item.jenisDagangan) {
+                case "makanan":
+                    return 120;
+                case "pakaian":
+                    return 150;
+                case "jasa":
+                    return 180;
+                default:
+                    return FIXED_RADIUS;
+            }
+        }
+        
+        // Fungsi untuk menampilkan marker berdasarkan filter
+        function displayMarkers(jenisDagangan, jamJualan) {
+            // Hapus semua circle dan marker yang sudah ada di peta
+            circles.forEach(circle => {
+                map.removeLayer(circle);
+            });
+            centerMarkers.forEach(marker => {
+                map.removeLayer(marker);
+            });
+            circles = [];
+            centerMarkers = [];
+            
+            // Filter data marker berdasarkan kriteria yang dipilih
+            const filteredData = pedagangData.filter(item => {
+                const jenisMatch = jenisDagangan === 'semua' || item.jenisDagangan === jenisDagangan;
+                const jamMatch = jamJualan === 'semua' || item.jamJualan === jamJualan;
+                return jenisMatch && jamMatch;
+            });
+            
+            // Tambahkan circle dan marker yang sesuai filter ke peta
+            filteredData.forEach(item => {
+                let circleColor;
+                let fillOpacity = 0.3;
+                
+                switch (item.warna) {
+                    case 'green':
+                        circleColor = '#2a9d8f';
+                        break;
+                    case 'red':
+                        circleColor = '#e76f51';
+                        break;
+                    case 'yellow':
+                        circleColor = '#e9c46a';
+                        break;
+                    default:
+                        circleColor = '#264653';
+                }
+                
+                // Dapatkan radius untuk item ini
+                const radius = getItemRadius(item);
+                
+                // Buat circle dengan radius yang ditentukan
+                const circle = L.circle(item.koordinat, {
+                    color: circleColor,
+                    fillColor: circleColor,
+                    fillOpacity: fillOpacity,
+                    radius: radius,
+                    weight: 1
+                });
+                
+                // Buat marker kecil di tengah circle
+                const centerMarker = L.circleMarker(item.koordinat, {
+                    radius: 4,
+                    color: circleColor,
+                    fillColor: circleColor,
+                    fillOpacity: 1,
+                    weight: 1
+                });
+                
+                const popupContent = `
+                    <div class="popup-content">
+                        <h3 class="popup-title">${item.nama}</h3>
+                        <div class="popup-detail">
+                            <span class="popup-label">Jenis:</span>
+                            <span class="popup-value">${item.jenisDagangan}</span>
+                        </div>
+                        <div class="popup-detail">
+                            <span class="popup-label">Jam:</span>
+                            <span class="popup-value">${item.jamJualan}</span>
+                        </div>
+                        <div class="popup-description">${item.deskripsi}</div>
+                        <div class="popup-detail" style="margin-top: 8px;">
+                            <span class="popup-label">Radius Area:</span>
+                            <span class="popup-value">${radius} meter</span>
+                        </div>
+                    </div>
+                `;
+                
+                circle.bindPopup(popupContent);
+                centerMarker.bindPopup(popupContent);
+                
+                circle.addTo(map);
+                centerMarker.addTo(map);
+                
+                circles.push(circle);
+                centerMarkers.push(centerMarker);
+            });
+        }
+        
+        // Event listener untuk dropdown jenis dagangan
+        document.getElementById('jenisDagangan').addEventListener('change', function() {
+            const jenisDagangan = this.value;
+            const jamJualan = document.getElementById('jamJualan').value;
+            displayMarkers(jenisDagangan, jamJualan);
+        });
+        
+        // Event listener untuk dropdown jam jualan
+        document.getElementById('jamJualan').addEventListener('change', function() {
+            const jenisDagangan = document.getElementById('jenisDagangan').value;
+            const jamJualan = this.value;
+            displayMarkers(jenisDagangan, jamJualan);
+        });
+        
+        // Event listener untuk tombol reset
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            document.getElementById('jenisDagangan').value = 'semua';
+            document.getElementById('jamJualan').value = 'semua';
+            displayMarkers('semua', 'semua');
+        });
+        
+        // Event listener untuk tombol apply filter
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const jenisDagangan = document.getElementById('jenisDagangan').value;
+            const jamJualan = document.getElementById('jamJualan').value;
+            displayMarkers(jenisDagangan, jamJualan);
+        });
+        
+        // Tampilkan semua marker saat halaman dimuat
+        displayMarkers('semua', 'semua');
+    </script>
+</body>
+</html>

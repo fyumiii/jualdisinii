@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Lokasi UMKM - JualDiSini</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- Leaflet CSS dan JavaScript -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <style>
+        .hero-pattern {
+            background-color: #f8f5f0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e9c46a' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .gradient-button {
+            background: linear-gradient(135deg, #2a9d8f 0%, #264653 100%);
+        }
+        
+        .gradient-button:hover {
+            background: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
+        }
+        
+        .primary-gradient {
+            background: linear-gradient(135deg, #2a9d8f 0%, #264653 100%);
+        }
+        
+        .header-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .secondary-button {
+            background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+        }
+        
+        .secondary-button:hover {
+            background: linear-gradient(135deg, #e76f51 0%, #f4a261 100%);
+        }
+        
+        #map {
+            height: 450px;
+            width: 100%;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem;
+        }
+        
+        .input-group {
+            transition: all 0.3s ease;
+        }
+        
+        .input-group:focus-within label {
+            color: #2a9d8f;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .success-message {
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .success-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(42, 157, 143, 0.2);
+        }
+        
+        .umkm-card {
+            transition: all 0.3s ease;
+        }
+        
+        .umkm-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased text-gray-800">
+    <!-- Header -->
+    <header class="bg-white header-shadow fixed w-full z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="logo-icon text-teal-700">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <span class="font-bold text-xl" style="color: #2a9d8f">JualDiSini</span>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="index.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Beranda</a>
+                <a href="peta.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Peta</a>
+                <a href="form.html" class="font-medium hover:text-teal-600 transition" style="color: #2a9d8f">Tambah Lokasi</a>
+                <a href="index.html" class="font-medium hover:text-teal-600 transition" style="color: #264653">Kontak</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="font-medium hover:text-teal-600 transition" style="color: #2a9d8f">Masuk</a>
+                <a href="#" class="gradient-button text-white px-4 py-2 rounded-md transition">Daftar</a>
+                <button class="md:hidden focus:outline-none">
+                    <i class="fas fa-bars text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl pt-24">
+        <header class="mb-8 text-center">
+            <div class="inline-block p-2 rounded-lg mb-2" style="background-color: rgba(42, 157, 143, 0.2)">
+                <i class="fas fa-map-marker-alt text-2xl" style="color: #2a9d8f"></i>
+            </div>
+            <h1 class="text-4xl font-bold mb-2" style="color: #264653">Tambah Lokasi UMKM</h1>
+            <p class="text-teal-700 max-w-2xl mx-auto">Bantu pelaku UMKM Kota Surakarta dengan menambahkan lokasi yang relevan untuk platform berjualan mereka pada peta interaktif</p>
+        </header>
+        
+        <!-- Pesan Sukses -->
+        <div id="successMessage" class="success-message bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-r-lg hidden">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">Data UMKM berhasil disimpan dan akan ditampilkan pada peta!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form Panel -->
+            <div class="lg:col-span-1 order-2 lg:order-1">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center" style="color: #264653">
+                        <i class="fas fa-store mr-2" style="color: #2a9d8f"></i>
+                        Data UMKM
+                    </h2>
+                    <form id="umkmForm" class="space-y-4">
+                        <div class="input-group">
+                            <label for="nama" class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-tag text-teal-600 mr-1"></i> Nama Lokasi
+                            </label>
+                            <input type="text" id="nama" name="nama" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="jenis" class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-shopping-bag text-teal-600 mr-1"></i> Jenis Dagangan
+                            </label>
+                            <select id="jenis" name="jenis" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="" disabled selected>Pilih jenis</option>
+                                <option value="makanan">Makanan</option>
+                                <option value="minuman">Minuman</option>
+                                <option value="pakaian">Pakaian</option>
+                                <option value="kerajinan">Kerajinan</option>
+                                <option value="jasa">Jasa</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="jam" class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-clock text-teal-600 mr-1"></i> Jam Jualan
+                            </label>
+                            <select id="jam" name="jam" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="" disabled selected>Pilih waktu</option>
+                                <option value="pagi">Pagi (05:00 - 10:00)</option>
+                                <option value="siang">Siang (10:00 - 15:00)</option>
+                                <option value="sore">Sore (15:00 - 19:00)</option>
+                                <option value="malam">Malam (19:00 - 24:00)</option>
+                                <option value="24jam">24 Jam</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-map-marker-alt text-teal-600 mr-1"></i> Koordinat
+                            </label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="lat" name="lat" placeholder="Latitude" readonly 
+                                    class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                                <input type="text" id="lng" name="lng" placeholder="Longitude" readonly 
+                                    class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                            </div>
+                            <p class="text-xs mt-1 flex items-center" style="color: #2a9d8f">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Klik pada peta untuk mendapatkan koordinat
+                            </p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="deskripsi" class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-align-left text-teal-600 mr-1"></i> Deskripsi
+                            </label>
+                            <textarea id="deskripsi" name="deskripsi" rows="3" placeholder="Jelaskan secara singkat tentang lokasi ini..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="kontak" class="block text-sm font-medium mb-1" style="color: #264653">
+                                <i class="fas fa-phone text-teal-600 mr-1"></i> Kontak
+                            </label>
+                            <input type="text" id="kontak" name="kontak" placeholder="Nomor telepon atau WhatsApp"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        
+                        <div class="flex space-x-2 pt-2">
+                            <button type="submit" class="flex-1 px-6 py-3 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 gradient-button btn-primary">
+                                <i class="fas fa-plus mr-2"></i> Tambah Lokasi
+                            </button>
+                            <button type="button" id="kirimButton" class="flex-1 px-6 py-3 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 secondary-button btn-primary">
+                                <i class="fas fa-paper-plane mr-2"></i> Kirim Data
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Daftar UMKM -->
+                <div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center" style="color: #264653">
+                        <i class="fas fa-list mr-2" style="color: #2a9d8f"></i>
+                        Daftar Lokasi
+                    </h2>
+                    <div id="umkmList" class="space-y-3">
+                        <p class="text-gray-500 italic">Belum ada Lokasi yang ditambahkan</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Peta Panel -->
+            <div class="lg:col-span-2 order-1 lg:order-2">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center" style="color: #264653">
+                        <i class="fas fa-map mr-2" style="color: #2a9d8f"></i>
+                        Peta Lokasi
+                    </h2>
+                    <div class="mb-4">
+                        <div id="map"></div>
+                    </div>
+                    <div class="p-4 rounded-lg mt-4" style="background-color: rgba(42, 157, 143, 0.1)">
+                        <h3 class="text-sm font-semibold mb-1" style="color: #264653">Petunjuk Penggunaan:</h3>
+                        <ul class="text-sm list-disc list-inside space-y-1" style="color: #2a9d8f">
+                            <li>Klik pada peta untuk menentukan lokasi UMKM</li>
+                            <li>Lengkapi detail UMKM pada formulir di samping</li>
+                            <li>Klik tombol "Tambah Lokasi" untuk menyimpan ke peta</li>
+                            <li>Klik tombol "Kirim Data" untuk mengirim semua data UMKM</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-white py-12 mt-12" style="background: linear-gradient(to bottom, #264653, #1a323c)">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="p-2 rounded-md bg-white text-teal-700">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <span class="font-bold text-xl">JualDiSini</span>
+                    </div>
+                    <p class="text-gray-300">Membantu UMKM menemukan lokasi strategis untuk berjualan di Kota Surakarta.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Layanan</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Peta Lokasi</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Analisis Keramaian</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Info Perizinan</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Konsultasi Lokasi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Perusahaan</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Tentang Kami</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Karir</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Blog</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-teal-300 transition">Kontak</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Hubungi Kami</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2" style="color: #e9c46a"></i> info@jualdisini.id</li>
+                        <li class="flex items-center"><i class="fas fa-phone mr-2" style="color: #e9c46a"></i> +62 812 3456 7890</li>
+                        <li class="flex items-center"><i class="fas fa-map-pin mr-2" style="color: #e9c46a"></i> Jl. Slamet Riyadi No. 123, Surakarta</li>
+                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-yellow-300 transition"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 JualDiSini. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Inisialisasi peta - fokus Kota Surakarta (koordinat Surakarta: -7.5595, 110.8322)
+        const map = L.map('map').setView([-7.5595, 110.8322], 13);
+        
+        // Tambahkan layer peta
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Variabel untuk menyimpan marker sementara dan daftar UMKM
+        let tempMarker = null;
+        const umkmList = [];
+        
+        // Ikon marker sesuai jenis UMKM
+        const icons = {
+            makanan: "utensils",
+            minuman: "coffee",
+            pakaian: "tshirt",
+            kerajinan: "paint-brush",
+            jasa: "tools",
+            lainnya: "store"
+        };
+        
+        // Warna marker sesuai jenis UMKM
+        const iconColors = {
+            makanan: "#EF4444",
+            minuman: "#3B82F6",
+            pakaian: "#10B981",
+            kerajinan: "#F59E0B",
+            jasa: "#8B5CF6",
+            lainnya: "#6B7280"
+        };
+        
+        // Event ketika peta diklik
+        map.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+            
+            // Tampilkan koordinat di form
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+            
+            // Hapus marker sementara jika sudah ada
+            if (tempMarker) {
+                map.removeLayer(tempMarker);
+            }
+            
+            // Tambahkan marker sementara baru
+            tempMarker = L.marker(e.latlng).addTo(map);
+            tempMarker.bindPopup("<b>Lokasi yang dipilih</b><br>Silakan lengkapi form.").openPopup();
+        });
+        
+        // Event saat form di-submit
+        document.getElementById('umkmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Ambil nilai dari form
+            const nama = document.getElementById('nama').value;
+            const jenis = document.getElementById('jenis').value;
+            const jam = document.getElementById('jam').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            const kontak = document.getElementById('kontak').value;
+            const lat = document.getElementById('lat').value;
+            const lng = document.getElementById('lng').value;
+            
+            // Validasi koordinat
+            if (!lat || !lng) {
+                alert('Silakan pilih lokasi pada peta terlebih dahulu');
+                return;
+            }
+            
+            // Buat objek data UMKM
+            const umkm = {
+                nama,
+                jenis,
+                jam,
+                deskripsi,
+                kontak,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                timestamp: new Date().toISOString()
+            };
+            
+            // Tambahkan ke array
+            umkmList.push(umkm);
+            
+            // Hapus marker sementara
+            if (tempMarker) {
+                map.removeLayer(tempMarker);
+                tempMarker = null;
+            }
+            
+            // Tambahkan marker baru dengan popup info
+            addMarkerToMap(umkm);
+            
+            // Update daftar UMKM di halaman
+            updateUMKMList();
+            
+            // Reset form
+            document.getElementById('umkmForm').reset();
+            document.getElementById('lat').value = '';
+            document.getElementById('lng').value = '';
+            
+            // Tampilkan pesan sukses
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.remove('hidden');
+            successMessage.classList.add('show');
+            
+            // Sembunyikan pesan sukses setelah 5 detik
+            setTimeout(function() {
+                successMessage.classList.remove('show');
+                setTimeout(function() {
+                    successMessage.classList.add('hidden');
+                }, 500);
+            }, 5000);
+        });
+        
+        // Fungsi untuk menambah marker ke peta
+        function addMarkerToMap(umkm) {
+            const icon = icons[umkm.jenis] || "store";
+            const color = iconColors[umkm.jenis] || "#6B7280";
+            
+            const marker = L.marker([umkm.lat, umkm.lng]).addTo(map);
+            
+            // Tambahkan popup dengan informasi UMKM
+            const popupContent = `
+                <div class="font-sans">
+                    <h3 class="text-lg font-bold">${umkm.nama}</h3>
+                    <div class="mt-2">
+                        <p><i class="fas fa-${icon}" style="color: ${color}"></i> <strong>Jenis:</strong> ${umkm.jenis}</p>
+                        <p><i class="fas fa-clock" style="color: #4F46E5"></i> <strong>Jam Jualan:</strong> ${umkm.jam}</p>
+                        ${umkm.kontak ? `<p><i class="fas fa-phone" style="color: #4F46E5"></i> <strong>Kontak:</strong> ${umkm.kontak}</p>` : ''}
+                        <p><i class="fas fa-align-left" style="color: #4F46E5"></i> <strong>Deskripsi:</strong> ${umkm.deskripsi || 'Tidak ada deskripsi'}</p>
+                    </div>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        }
+        
+        // Fungsi untuk update tampilan daftar UMKM
+        function updateUMKMList() {
+            const listElement = document.getElementById('umkmList');
+            
+            if (umkmList.length === 0) {
+                listElement.innerHTML = '<p class="text-gray-500 italic">Belum ada UMKM yang ditambahkan</p>';
+                return;
+            }
+            
+            let html = '';
+            umkmList.forEach((umkm, index) => {
+                const icon = icons[umkm.jenis] || "store";
+                const color = iconColors[umkm.jenis] || "#6B7280";
+                
+                html += `
+                    <div class="p-4 border border-gray-200 rounded-lg umkm-card animate-fade-in" style="border-left: 4px solid ${color}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-medium flex items-center">
+                                    <i class="fas fa-${icon} mr-2" style="color: ${color}"></i>
+                                    ${umkm.nama}
+                                </h3>
+                                <p class="text-sm text-gray-600">${umkm.jenis} - Jam jualan: ${umkm.jam}</p>
+                                ${umkm.kontak ? `<p class="text-sm text-gray-600">Kontak: ${umkm.kontak}</p>` : ''}
+                                <p class="text-sm mt-1 text-gray-700">${umkm.deskripsi || 'Tidak ada deskripsi'}</p>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700 ml-2" onclick="hapusUMKM(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listElement.innerHTML = html;
+        }
+        
+        // Fungsi untuk menghapus UMKM
+        function hapusUMKM(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus UMKM ini?')) {
+                // Hapus dari array
+                umkmList.splice(index, 1);
+                
+                // Refresh peta
+                refreshMap();
+                
+                // Update daftar
+                updateUMKMList();
+            }
+        }
+        
+        // Fungsi untuk refresh peta dan menampilkan semua marker
+        function refreshMap() {
+            // Hapus semua layer kecuali basemap
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+            
+            // Tambahkan kembali semua marker UMKM
+            umkmList.forEach(umkm => {
+                addMarkerToMap(umkm);
+            });
+        }
+        
+        // Event untuk tombol kirim data
+        document.getElementById('kirimButton').addEventListener('click', function() {
+            if (umkmList.length === 0) {
+                alert('Belum ada data UMKM untuk dikirim. Silakan tambahkan lokasi terlebih dahulu.');
+                return;
+            }
+            
+            // Simulasi pengiriman data
+            const loadingBtn = this;
+            loadingBtn.disabled = true;
+            loadingBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+            
+            // Simulasi proses pengiriman (3 detik)
+            setTimeout(function() {
+                loadingBtn.disabled = false;
+                loadingBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Terkirim!';
+                
+                // Ubah kembali tampilan tombol setelah 2 detik
+                setTimeout(function() {
+                    loadingBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Kirim Data';
+                    
+                    // Reset data setelah berhasil kirim
+                    umkmList.length = 0;
+                    refreshMap();
+                    updateUMKMList();
+                    
+                    // Tampilkan alert berhasil
+                    alert('Data UMKM berhasil dikirim ke server!');
+                }, 2000);
+            }, 3000);
+        });
+    </script>
